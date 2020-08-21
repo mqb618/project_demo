@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>websocket测试</title>
+</head>
+<body>
+<h1>Web Socket聊天通信</h1>
+    <input id="text" type="text"/>
+    <button onclick="send()">发送消息</button>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <button onclick="closeWs()">退出聊天</button>
+    <hr/>
+    <div id="message"></div>
+</body>
+
+<script type="text/javascript">
+
+    var name = null;
+
+    var websocket = null;
+
+    window.onload = function () {
+        name = prompt('请给自己去一个昵称');
+        if(name == null || name == '' ){
+            name = "游客" + randomString(6);
+        }
+
+        function randomString(e) {
+            e = e || 32;
+            var t = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678",
+                a = t.length,
+                n = "";
+            for (i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a));
+            return n
+        }
+
+
+        function showMsgInDiv(data) {
+            document.getElementById("message").innerText += data + "\n";
+        }
+
+
+        if('WebSocket' in window){
+            websocket = new WebSocket("ws://localhost:8001/websocket/" + name);
+        }else{
+            alert("当前浏览器不支持websocket");
+        }
+
+        websocket.onerror = function () {
+            showMsgInDiv("websocket 连接出错")
+        }
+
+        // websocket.onopen = function () {
+        //     showMsgInDiv("websocket 连接成功");
+        // }
+
+        websocket.onmessage = function (event) {
+            showMsgInDiv(event.data);
+        }
+
+        websocket.onclose = function () {
+            showMsgInDiv("websocket 断开连接")
+        }
+
+        window.onbeforeunload=function () {
+            websocket.close();
+        }
+    }
+    function send() {
+        var msg=document.getElementById('text').value;
+        websocket.send(msg);
+    }
+
+    function closeWs() {
+        websocket.close();
+    }
+
+
+</script>
+</html>

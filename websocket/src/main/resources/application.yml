@@ -1,0 +1,9 @@
+server:
+  port: 8001
+
+spring:
+  mvc:
+    view:
+      suffix: .html
+  resources:
+    static-locations: classpath:/static
